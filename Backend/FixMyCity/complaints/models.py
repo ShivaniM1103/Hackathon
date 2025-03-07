@@ -2,7 +2,7 @@ from django.db import models
 from registration.models import User
 from django.core.validators import RegexValidator
 from cloudinary.models import CloudinaryField
-
+from datetime import datetime
 
 # Define a validator for the phone number
 phone_validator = RegexValidator(regex=r'^\d{10}$', message="Phone number must be 10 digits.")
@@ -38,13 +38,16 @@ class Complaint(models.Model):
                             transformation={"quality": 'auto:low', 'width': 300, 'height': 300, 'crop': "scale"},
                             format="jpeg")
     location = models.CharField(max_length=255)
+    latitude = models.CharField(max_length=255)
+    longitude = models.CharField(max_length=255)
     description = models.TextField()
     summary = models.TextField(null=True, blank=True)
     classified_domain = models.ForeignKey(Domain, on_delete=models.SET_NULL, null=True, blank=True)
     vote = models.IntegerField(default=0)
     assigned = models.ForeignKey(User, on_delete=models.CASCADE, related_name="assigned_complaints", limit_choices_to={'role': 'Authority'})  
-    submitted_date = models.DateTimeField(auto_now_add=True)  
-    completed_date = models.DateTimeField(null=True, blank=True)  
+    submitted_date = models.DateTimeField(default=datetime.now)  
+    completed_date = models.DateTimeField(null=True, blank=True)
+
 
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
